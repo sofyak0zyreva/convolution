@@ -1,23 +1,5 @@
 import org.bytedeco.javacpp.Loader
-import org.bytedeco.opencv.global.opencv_imgcodecs
-import org.bytedeco.opencv.global.opencv_imgproc
-import org.bytedeco.opencv.opencv_core.Mat
-
-fun loadImage(path: String): Mat {
-    val mat = opencv_imgcodecs.imread(path)
-    if (mat.empty()) throw IllegalArgumentException("Failed to load image: $path")
-    return mat
-}
-
-fun saveImage(image: Mat, path: String) {
-    if (!opencv_imgcodecs.imwrite(path, image)) throw IllegalStateException("Failed to save image: $path")
-}
-
-fun Mat.toGrayscale(): Mat {
-    val grayMat = Mat()
-    opencv_imgproc.cvtColor(this, grayMat, opencv_imgproc.COLOR_BGR2GRAY) // Note: OpenCV uses BGR order by default!
-    return grayMat
-}
+import java.io.File
 
 fun promptForImagePath(): String {
     while (true) {
@@ -25,7 +7,7 @@ fun promptForImagePath(): String {
         val path = readlnOrNull()?.trim()
         if (!path.isNullOrBlank()) {
             try {
-                val image = loadImage(path) // check if image is valid
+                loadImage(path) // check if image is valid
                 return path
             } catch (e: Exception) {
                 println("❌ Cannot load image. Reason: ${e.message}")
@@ -40,7 +22,7 @@ fun promptForKernelName(): String {
     val kernelNames = kernelPool.keys.toList()
 
     while (true) {
-        println("\nAvailable kernels:")
+        println("\nAvailable filters:")
         kernelNames.forEachIndexed { index, name ->
             println("  [$index] $name")
         }
@@ -62,16 +44,15 @@ fun main() {
         val imagePath = promptForImagePath()
         val inputImage = loadImage(imagePath)
         val grayImage = inputImage.toGrayscale()
+        val filename = File(imagePath).nameWithoutExtension
 
         val kernelName = promptForKernelName()
         val selectedKernel = kernelPool[kernelName] ?: throw IllegalArgumentException("Kernel should not be null.")
-
         println("Applying kernel: $kernelName...")
 
-        val resultImage = grayImage.seqConvolve(selectedKernel)
-        val outputPath = "output_${kernelName}.bmp"
+        val resultImage = grayImage.seqConvolve(createBasicFilter(selectedKernel))
+        val outputPath = "output_${filename}_${kernelName}.bmp"
         saveImage(resultImage, outputPath)
-
         println("✅ Done! Output saved to: $outputPath")
 
     } catch (e: Exception) {

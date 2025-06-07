@@ -5,6 +5,9 @@ import java.io.File
 import java.util.*
 import kotlin.math.abs
 
+const val imageSizeBound = 2400
+const val filterSizeBound = 9
+
 // create a grayscale Mat filled with random values between 0 and 255
 fun createRandomImage(rows: Int, cols: Int): Mat {
     val image = Mat(rows, cols, opencv_core.CV_8UC1)
