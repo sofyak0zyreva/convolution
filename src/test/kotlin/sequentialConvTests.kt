@@ -7,6 +7,7 @@ import org.bytedeco.opencv.global.opencv_core.countNonZero
 import org.bytedeco.opencv.global.opencv_imgcodecs.imread
 import org.junit.jupiter.api.BeforeEach
 import java.io.File
+import java.util.*
 
 
 // create a grayscale Mat filled with random values between 0 and 255
@@ -22,18 +23,36 @@ fun createRandomImage(rows: Int, cols: Int): Mat {
     return image
 }
 
-fun createRandomKernel(size: Int): Array<DoubleArray> {
+fun createRandomFilter(size: Int): Filter {
     require(size % 2 == 1) {"Kernel size must be odd"}
-    val kernel = Array(size){ DoubleArray(size) }
-    val rng = java.util.Random()
-    val min = -10.0
+    val kernel = Array(size) { DoubleArray(size) }
+    val min = 0.0001
     val max = 10.0
-    for (y in 0 until size) {
-        for (x in 0 until size) {
-            kernel[y][x] = rng.nextDouble() * (max - min) + min
-         }
+
+    for (i in 0 until size) {
+        for (j in 0 until size) {
+            val value = min + Random().nextDouble() * (max - min)
+            kernel[i][j] = value
+        }
     }
-    return kernel
+
+    val sum = kernel.sumOf { row -> row.sum() }
+    // normalize if sum is not zero
+    if (sum != 0.0) {
+        for (i in 0 until size) {
+            for (j in 0 until size) {
+                kernel[i][j] /= sum
+            }
+        }
+    }
+    val factor = Random().nextDouble()
+    return Filter(kernel = kernel, factor = factor)
+}
+
+fun setRandomFilterSize(): Int {
+    val size = Random().nextInt(3, filterSizeBound)
+    // to get the odd size
+    return size + (size + 1) % 2
 }
 
 fun assertMatEquals(expected: Mat, actual: Mat, tolerance: Int = 0) {
@@ -48,89 +67,81 @@ fun assertMatEquals(expected: Mat, actual: Mat, tolerance: Int = 0) {
     }
 }
 
-fun padKernelWithZeros(kernel: Array<DoubleArray>, newSize: Int): Array<DoubleArray> {
+fun padKernelWithZeros(filter: Filter, newSize: Int): Filter {
     require(newSize % 2 == 1) { "New kernel size must be odd" }
+    val kernel = filter.kernel
     val oldSize = kernel.size
     require(kernel[0].size == oldSize) { "Kernel must be square" }
     require(newSize >= oldSize) { "New size must be >= old size" }
 
     val pad = (newSize - oldSize) / 2
-    return Array(newSize) { y ->
+    val newKernel =  Array(newSize) { y ->
         DoubleArray(newSize) { x ->
             val ky = y - pad
             val kx = x - pad
             if (ky in kernel.indices && kx in kernel[0].indices) kernel[ky][kx] else 0.0
         }
     }
+    return Filter(kernel = newKernel, factor = filter.factor, bias = filter.bias)
 }
 
-fun flipKernel(kernel: Array<DoubleArray>): Array<DoubleArray> {
-    return Array(kernel.size) { i ->
-        DoubleArray(kernel[0].size) { j ->
-            kernel[kernel.size - 1 - i][kernel[0].size - 1 - j]
-        }
-    }
-}
-
-fun composeKernels(
-    kernel1: Array<DoubleArray>,
-    kernel2: Array<DoubleArray>
-): Array<DoubleArray> {
+fun composeKernels(filter1: Filter, filter2: Filter): Filter {
+    val kernel1 = filter1.kernel
+    val kernel2 = filter2.kernel
     val size1 = kernel1.size
-    println(size1)
     val size2 = kernel2.size
-    println(size2)
     val newSize = size1 + size2 - 1
-
     val result = Array(newSize) { DoubleArray(newSize) { 0.0 } }
-    println("composed kernel")
+
     for (i in 0 until newSize) {
         for (j in 0 until newSize) {
+            var sum = 0.0
             for (ki in 0 until size1) {
                 for (kj in 0 until size1) {
                     val i2 = i - ki
                     val j2 = j - kj
                     if (i2 in 0 until size2 && j2 in 0 until size2) {
-                        result[i][j] += kernel1[ki][kj] * kernel2[i2][j2]
+                        sum += kernel1[ki][kj] * kernel2[i2][j2]
                     }
                 }
             }
-            println(result[i][j])
+            result[i][j] = sum
         }
     }
-    return result
+    return Filter(kernel = result, factor = filter1.factor * filter2.factor, bias = filter1.bias * filter2.factor + filter2.bias)
 }
 
-fun Mat.toArray2D(): Array<IntArray> {
-    val result = Array(rows()) { IntArray(cols()) }
-    for (y in 0 until rows()) {
-        for (x in 0 until cols()) {
-            result[y][x] = this.ptr(y, x).get(0).toInt() and 0xFF
-        }
-    }
-    return result
-}
+//fun Mat.toArray2D(): Array<IntArray> {
+//    val result = Array(rows()) { IntArray(cols()) }
+//    for (y in 0 until rows()) {
+//        for (x in 0 until cols()) {
+//            result[y][x] = this.ptr(y, x).get(0).toInt() and 0xFF
+//        }
+//    }
+//    return result
+//}
 
 class SequentialConvolutionTestsWithRandomImages{
     private lateinit var image: Mat
 
     @BeforeEach
     fun setup() {
-        val imageSize = java.util.Random().nextInt(imageSizeBound)
+        val imageSize = Random().nextInt(imageSizeBound)
         image = createRandomImage(imageSize, imageSize)
     }
 
     @Test
     fun `identity filter should return the same image`() {
         val identityKernel = kernelPool["identity"] ?: throw IllegalArgumentException("Kernel must exist in the pool")
-        val result = image.seqConvolve(identityKernel)
+        val result = image.seqConvolve(createBasicFilter(identityKernel))
         assertMatEquals(image, result)
     }
 
     @Test
     fun `zero kernel should return a black image`() {
-        val zeroKernel = Array(3) { DoubleArray(3) { 0.0 } }
-        val result = image.seqConvolve(zeroKernel)
+        val size = setRandomFilterSize()
+        val zeroKernel = Array(size) { DoubleArray(size) { 0.0 } }
+        val result = image.seqConvolve(createBasicFilter(zeroKernel))
         assertTrue(countNonZero(result) == 0)
     }
 
@@ -146,38 +157,38 @@ class SequentialConvolutionTestsWithRandomImages{
             doubleArrayOf(0.0, 0.0, 1.0),
             doubleArrayOf(0.0, 0.0, 0.0)
         )
-        val result = image.seqConvolve(shiftLeft).seqConvolve(shiftRight)
+        val result = image.seqConvolve(createBasicFilter(shiftLeft)).seqConvolve(createBasicFilter(shiftRight))
         assertMatEquals(image, result)
     }
 
     @Test
     fun `zero-padding a kernel should not change the result`() {
-        val kernel = createRandomKernel(5)
-        val paddedKernel = padKernelWithZeros(kernel, 9)
-        val resultOriginal = image.seqConvolve(kernel)
-        val resultPadded = image.seqConvolve(paddedKernel)
+        val filter = createRandomFilter(5)
+        val paddedFilter = padKernelWithZeros(filter, filterSizeBound)
+        val resultOriginal = image.seqConvolve(filter)
+        val resultPadded = image.seqConvolve(paddedFilter)
         assertMatEquals(resultOriginal, resultPadded)
     }
 
-//    @Test
-//    fun `composition of two filters is the same as sequential application`() {
-//        val kernel1 = kernelPool["sharpen"] ?: throw IllegalArgumentException("Kernel must exist in the pool")
-//        val kernel2 = kernelPool[ "sharpen"] ?: throw IllegalArgumentException("Kernel must exist in the pool")
-//        val flippedKernel2 = flipKernel(kernel2)
-////        val composedKernel = composeKernels(kernel1, flippedKernel2)
-//        val composedKernel = composeKernels(kernel2, kernel1)
-//        println(composedKernel.joinToString("\n") { it.joinToString(" ") })
-//        println(composedKernel.size)
-//        val test_image = image
-//        val seqResult = test_image.seqConvolve(kernel1).seqConvolve(kernel2)
+    @Test
+    fun `composition of two filters is the same as sequential application`() {
+        val filter1 = createRandomFilter(setRandomFilterSize())
+        val filter2 = createRandomFilter(setRandomFilterSize())
+        val composedKernel = composeKernels(filter1, filter2)
+//        println(composedKernel.kernel.joinToString("\n") { it.joinToString(" ") })
+//        println(composedKernel.kernel.size)
+//        val test_image = image.toArray2D()
+//        println(test_image.joinToString("\n") { it.joinToString(" ") })
+//        println()
+        val seqResult = image.seqConvolve(filter1).seqConvolve(filter2)
 //        val array = seqResult.toArray2D()
 //        println(array.joinToString("\n") { it.joinToString(" ") })
-//        val composedResult = test_image.seqConvolve(composedKernel)
+        val composedResult = image.seqConvolve(composedKernel)
 //        val array2 = composedResult.toArray2D()
 //        println()
 //        println(array2.joinToString("\n") { it.joinToString(" ") })
-//        assertMatEquals(seqResult, composedResult, 1)
-//    }
+        assertMatEquals(seqResult, composedResult, 1)
+    }
 
 }
 
@@ -198,22 +209,21 @@ class SequentialConvolutionTestsWithTestImages{
 
     @BeforeEach
     fun setup() {
-//        val resource = {}::class.java.getResource("/cat.bmp")
-//        image = imread(resource.path)
         image = loadRandomImageFromResources()
     }
 
     @Test
     fun `identity filter should return the same image`() {
         val identityKernel = kernelPool["identity"] ?: throw IllegalArgumentException("Kernel must exist in the pool")
-        val result = image.seqConvolve(identityKernel)
+        val result = image.seqConvolve(createBasicFilter(identityKernel))
         assertMatEquals(image, result)
     }
 
     @Test
     fun `zero kernel should return a black image`() {
-        val zeroKernel = Array(3) { DoubleArray(3) { 0.0 } }
-        val result = image.seqConvolve(zeroKernel)
+        val size = setRandomFilterSize()
+        val zeroKernel = Array(size) { DoubleArray(size) { 0.0 } }
+        val result = image.seqConvolve(createBasicFilter(zeroKernel))
         assertTrue(countNonZero(result) == 0)
     }
 
@@ -229,17 +239,27 @@ class SequentialConvolutionTestsWithTestImages{
             doubleArrayOf(0.0, 0.0, 1.0),
             doubleArrayOf(0.0, 0.0, 0.0)
         )
-        val result = image.seqConvolve(shiftLeft).seqConvolve(shiftRight)
+        val result = image.seqConvolve(createBasicFilter(shiftLeft)).seqConvolve(createBasicFilter(shiftRight))
         assertMatEquals(image, result)
     }
 
     @Test
     fun `zero-padding a kernel should not change the result`() {
-        val kernel = createRandomKernel(5)
-        val paddedKernel = padKernelWithZeros(kernel, 9)
-        val resultOriginal = image.seqConvolve(kernel)
-        val resultPadded = image.seqConvolve(paddedKernel)
+        val filter = createRandomFilter(5)
+        val paddedFilter = padKernelWithZeros(filter, filterSizeBound)
+        val resultOriginal = image.seqConvolve(filter)
+        val resultPadded = image.seqConvolve(paddedFilter)
         assertMatEquals(resultOriginal, resultPadded)
+    }
+
+    @Test
+    fun `composition of two filters is the same as sequential application`() {
+        val filter1 = createRandomFilter(setRandomFilterSize())
+        val filter2 = createRandomFilter(setRandomFilterSize())
+        val composedKernel = composeKernels(filter1, filter2)
+        val seqResult = image.seqConvolve(filter1).seqConvolve(filter2)
+        val composedResult = image.seqConvolve(composedKernel)
+        assertMatEquals(seqResult, composedResult, 1)
     }
 
 }
