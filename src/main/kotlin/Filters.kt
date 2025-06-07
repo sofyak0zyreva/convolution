@@ -28,3 +28,7 @@ val kernelPool = mapOf(
         doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 / 9),
     )
 )
+
+fun createBasicFilter(kernel: Array<DoubleArray>): Filter {
+    return Filter(kernel = kernel)
+}
