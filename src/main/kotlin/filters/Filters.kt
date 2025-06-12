@@ -34,3 +34,7 @@ val kernelPool = mapOf(
 fun createBasicFilter(kernel: Array<DoubleArray>): Filter {
     return Filter(kernel = kernel)
 }
+fun checkFilterSize(filter: Filter) {
+    val kernel = filter.kernel
+    require(kernel.size % 2 == 1 && kernel[0].size % 2 == 1) { "Kernel must have odd dimensions" }
+}
