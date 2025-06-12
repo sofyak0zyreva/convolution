@@ -31,12 +31,53 @@ private fun promptForFilterName(): String {
             println("  [$index] $name")
         }
 
-        print("Select kernel index: ")
+        print("Select filter index: ")
         val index = readlnOrNull()?.toIntOrNull()
         if (index != null && index in kernelNames.indices) {
             return kernelNames[index]
         } else {
             println("❌ Invalid index. Please enter a number from the list.")
+        }
+    }
+}
+
+private fun promptForMode(): ConvolutionMode {
+    val options = listOf(
+        "sequential",
+        "parallel pixels",
+        "parallel rows (with batch size)",
+        "parallel columns (with batch size)",
+        "parallel tiles (with tile size)"
+    )
+
+    println("\nAvailable convolution modes:")
+    options.forEachIndexed { index, name ->
+        println("  [$index] $name")
+    }
+
+    while (true) {
+        print("Select mode index: ")
+        when (readlnOrNull()?.toIntOrNull()) {
+            0 -> return ConvolutionMode.Sequential
+            1 -> return ConvolutionMode.ParallelPixels
+            2 -> {
+                print("Enter batch size [default 32]: ")
+                val batch = readlnOrNull()?.toIntOrNull() ?: 32
+                return ConvolutionMode.ParallelRows(batch)
+            }
+            3 -> {
+                print("Enter batch size [default 32]: ")
+                val batch = readlnOrNull()?.toIntOrNull() ?: 32
+                return ConvolutionMode.ParallelCols(batch)
+            }
+            4 -> {
+                print("Enter tile width [default 32]: ")
+                val w = readlnOrNull()?.toIntOrNull() ?: 32
+                print("Enter tile height [default 32]: ")
+                val h = readlnOrNull()?.toIntOrNull() ?: 32
+                return ConvolutionMode.ParallelTiles(w, h)
+            }
+            else -> println("❌ Invalid index. Please enter a number from the list.")
         }
     }
 }
@@ -50,12 +91,16 @@ fun main() {
         val grayImage = inputImage.toGrayscale()
         val filename = File(imagePath).nameWithoutExtension
 
+        val selectedMode = promptForMode()
+        val modeName = selectedMode.toString()
+
         val filterName = promptForFilterName()
-        val selectedKernel = kernelPool[filterName] ?: throw IllegalArgumentException("filters.Filter should not be null.")
+        val selectedKernel = kernelPool[filterName] ?: throw IllegalArgumentException("Filter should not be null.")
+        val filter = createBasicFilter(selectedKernel)
         println("Applying filter: $filterName...")
 
-        val resultImage = grayImage.seqConvolve(createBasicFilter(selectedKernel))
-        val outputPath = "output_${filename}_${filterName}.bmp"
+        val resultImage = grayImage.convolveWithMode(filter, selectedMode)
+        val outputPath = "output_${filename}_${filterName}_${modeName}.bmp"
         saveImage(resultImage, outputPath)
         println("✅ Done! Output saved to: $outputPath")
 
