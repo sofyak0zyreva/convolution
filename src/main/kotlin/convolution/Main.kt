@@ -1,7 +1,11 @@
+package convolution
+
+import filters.createBasicFilter
+import filters.kernelPool
 import org.bytedeco.javacpp.Loader
 import java.io.File
 
-fun promptForImagePath(): String {
+private fun promptForImagePath(): String {
     while (true) {
         print("Enter path to image (e.g., sample.bmp): ")
         val path = readlnOrNull()?.trim()
@@ -18,7 +22,7 @@ fun promptForImagePath(): String {
     }
 }
 
-fun promptForKernelName(): String {
+private fun promptForFilterName(): String {
     val kernelNames = kernelPool.keys.toList()
 
     while (true) {
@@ -46,12 +50,12 @@ fun main() {
         val grayImage = inputImage.toGrayscale()
         val filename = File(imagePath).nameWithoutExtension
 
-        val kernelName = promptForKernelName()
-        val selectedKernel = kernelPool[kernelName] ?: throw IllegalArgumentException("Kernel should not be null.")
-        println("Applying kernel: $kernelName...")
+        val filterName = promptForFilterName()
+        val selectedKernel = kernelPool[filterName] ?: throw IllegalArgumentException("filters.Filter should not be null.")
+        println("Applying filter: $filterName...")
 
         val resultImage = grayImage.seqConvolve(createBasicFilter(selectedKernel))
-        val outputPath = "output_${filename}_${kernelName}.bmp"
+        val outputPath = "output_${filename}_${filterName}.bmp"
         saveImage(resultImage, outputPath)
         println("✅ Done! Output saved to: $outputPath")
 

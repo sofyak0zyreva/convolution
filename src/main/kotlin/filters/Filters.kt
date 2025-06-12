@@ -1,3 +1,5 @@
+package filters
+
 val kernelPool = mapOf(
     "blur_3x3" to Array(3) { DoubleArray(3) { 1.0/9 } },
     "blur_5x5" to Array(5) { DoubleArray(5) { 1.0/25 } },

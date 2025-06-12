@@ -1,3 +1,6 @@
+package convolution
+
+import filters.Filter
 import org.bytedeco.opencv.global.opencv_core.CV_8UC1
 import org.bytedeco.opencv.opencv_core.Mat
 import kotlin.math.roundToInt
@@ -13,16 +16,16 @@ fun Mat.seqConvolve(filter: Filter): Mat {
             var sum = 0.0
             for (ky in -kRadius..kRadius) {
                 for (kx in -kRadius..kRadius) {
-                    // Wrap-around coordinates
+                    // wrap-around coordinates
                     val wrappedY = (y + ky + rows()) % rows()
                     val wrappedX = (x + kx + cols()) % cols()
-                    // Get pixel value from the input matrix
+                    // get pixel value from the input matrix
                     val pixelValue = (this.ptr(wrappedY, wrappedX).get(0).toInt() and 0xFF).toDouble()
-                    // Multiply by kernel
+                    // multiply by kernel
                     sum += pixelValue * kernel[ky + kRadius][kx + kRadius]
                 }
             }
-            // Clamp to valid 8-bit range and store in output matrix
+            // clamp to valid 8-bit range and store in output matrix
             val clampedValue = (sum * filter.factor + filter.bias).roundToInt().coerceIn(0, 255)
             output.ptr(y, x).put(clampedValue.toByte())
 

@@ -1,3 +1,5 @@
+package filters
+
 class Filter (
     val kernel: Array<DoubleArray>,
     val factor: Double = 1.0,

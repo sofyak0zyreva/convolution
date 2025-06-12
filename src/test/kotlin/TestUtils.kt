@@ -1,3 +1,4 @@
+import filters.Filter
 import org.bytedeco.opencv.global.opencv_core
 import org.bytedeco.opencv.global.opencv_imgcodecs
 import org.bytedeco.opencv.opencv_core.Mat
@@ -116,7 +117,7 @@ fun loadRandomImageFromResources(): Mat {
     val imageFiles = folder.listFiles { file ->
         file.isFile && file.name.endsWith(".bmp")
     } ?: throw IllegalStateException("No image files found in resources")
-    imageFiles.forEach { println(it.name) }
+//    imageFiles.forEach { println(it.name) }
     val randomFile = imageFiles.random()
     return opencv_imgcodecs.imread(randomFile.absolutePath)
 }
