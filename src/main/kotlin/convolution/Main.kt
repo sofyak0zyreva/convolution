@@ -90,6 +90,7 @@ fun main() {
         val grayImage = inputImage.toGrayscale()
         val filename = File(imagePath).nameWithoutExtension
 
+        println("Image size is ${grayImage.cols()}x${grayImage.rows()}")
         val selectedMode = promptForMode()
         val modeName = selectedMode.toString()
 

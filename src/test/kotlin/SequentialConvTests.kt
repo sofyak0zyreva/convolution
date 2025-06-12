@@ -1,7 +1,6 @@
 import convolution.seqConvolve
 import filters.createBasicFilter
 import filters.filterPool
-import filters.kernelPool
 import org.bytedeco.opencv.opencv_core.Mat
 import kotlin.test.Test
 import org.junit.jupiter.api.Assertions.assertTrue
