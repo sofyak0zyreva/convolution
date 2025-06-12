@@ -117,7 +117,6 @@ fun loadRandomImageFromResources(): Mat {
     val imageFiles = folder.listFiles { file ->
         file.isFile && file.name.endsWith(".bmp")
     } ?: throw IllegalStateException("No image files found in resources")
-//    imageFiles.forEach { println(it.name) }
     val randomFile = imageFiles.random()
     return opencv_imgcodecs.imread(randomFile.absolutePath)
 }

@@ -13,8 +13,9 @@ class SequentialConvolutionTestsWithRandomImages{
 
     @BeforeEach
     fun setup() {
-        val imageSize = Random().nextInt(imageSizeBound)
-        image = createRandomImage(imageSize, imageSize)
+        val imageHeight = Random().nextInt(imageSizeBound)
+        val imageWidth = Random().nextInt(imageSizeBound)
+        image = createRandomImage(imageHeight, imageWidth)
     }
 
     @Test
