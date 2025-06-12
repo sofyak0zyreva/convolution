@@ -1,5 +1,6 @@
 import convolution.seqConvolve
 import filters.createBasicFilter
+import filters.filterPool
 import filters.kernelPool
 import org.bytedeco.opencv.opencv_core.Mat
 import kotlin.test.Test
@@ -20,8 +21,8 @@ class SequentialConvolutionTestsWithRandomImages{
 
     @Test
     fun `identity filter should return the same image`() {
-        val identityKernel = kernelPool["identity"] ?: throw IllegalArgumentException("Kernel must exist in the pool")
-        val result = image.seqConvolve(createBasicFilter(identityKernel))
+        val identityFilter = filterPool["identity"] ?: throw IllegalArgumentException("Filter must exist in the pool")
+        val result = image.seqConvolve(identityFilter)
         assertMatEquals(image, result)
     }
 
@@ -80,8 +81,8 @@ class SequentialConvolutionTestsWithTestImages{
 
     @Test
     fun `identity filter should return the same image`() {
-        val identityKernel = kernelPool["identity"] ?: throw IllegalArgumentException("Kernel must exist in the pool")
-        val result = image.seqConvolve(createBasicFilter(identityKernel))
+        val identityFilter = filterPool["identity"] ?: throw IllegalArgumentException("Filter must exist in the pool")
+        val result = image.seqConvolve(identityFilter)
         assertMatEquals(image, result)
     }
 

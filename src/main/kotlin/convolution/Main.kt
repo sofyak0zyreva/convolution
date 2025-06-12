@@ -1,7 +1,6 @@
 package convolution
 
-import filters.createBasicFilter
-import filters.kernelPool
+import filters.filterPool
 import org.bytedeco.javacpp.Loader
 import java.io.File
 
@@ -23,18 +22,18 @@ private fun promptForImagePath(): String {
 }
 
 private fun promptForFilterName(): String {
-    val kernelNames = kernelPool.keys.toList()
+    val filterNames = filterPool.keys.toList()
 
     while (true) {
         println("\nAvailable filters:")
-        kernelNames.forEachIndexed { index, name ->
+        filterNames.forEachIndexed { index, name ->
             println("  [$index] $name")
         }
 
         print("Select filter index: ")
         val index = readlnOrNull()?.toIntOrNull()
-        if (index != null && index in kernelNames.indices) {
-            return kernelNames[index]
+        if (index != null && index in filterNames.indices) {
+            return filterNames[index]
         } else {
             println("❌ Invalid index. Please enter a number from the list.")
         }
@@ -95,8 +94,7 @@ fun main() {
         val modeName = selectedMode.toString()
 
         val filterName = promptForFilterName()
-        val selectedKernel = kernelPool[filterName] ?: throw IllegalArgumentException("Filter should not be null.")
-        val filter = createBasicFilter(selectedKernel)
+        val filter = filterPool[filterName] ?: throw IllegalArgumentException("Filter should not be null.")
         println("Applying filter: $filterName...")
 
         val resultImage = grayImage.convolveWithMode(filter, selectedMode)
