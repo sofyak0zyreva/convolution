@@ -5,7 +5,7 @@ import kotlin.math.sqrt
 
 internal data class BenchmarkResult(
     val mode: ConvolutionMode,
-    val times: List<Double>,
+    val times: List<Double>
 ) {
     private val n: Int get() = times.size
     private val average: Double get() = times.average()

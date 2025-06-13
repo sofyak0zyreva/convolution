@@ -1,16 +1,26 @@
 package benchmarks
 
-import convolution.*
+import convolution.ConvolutionMode
+import convolution.loadImage
+import convolution.parallelConvolveCols
+import convolution.parallelConvolvePixels
+import convolution.parallelConvolveRows
+import convolution.parallelConvolveTiles
+import convolution.promptForFilterName
+import convolution.promptForImagePath
+import convolution.promptForMode
+import convolution.seqConvolve
+import convolution.toGrayscale
 import createRandomImage
 import filters.Filter
 import filters.filterPool
 import imageSizeBound
 import org.bytedeco.opencv.opencv_core.Mat
-import java.util.*
+import java.util.Random
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
-internal inline fun estimateTime(block: () -> Unit) : Double {
+internal inline fun estimateTime(block: () -> Unit): Double {
     return measureTime { block() }.toDouble(DurationUnit.SECONDS)
 }
 
@@ -20,7 +30,8 @@ internal fun measureSingleModeTime(image: Mat, mode: ConvolutionMode, filter: Fi
         ConvolutionMode.ParallelPixels -> estimateTime { image.parallelConvolvePixels(filter) }
         is ConvolutionMode.ParallelRows -> estimateTime { image.parallelConvolveRows(filter, mode.batchSize) }
         is ConvolutionMode.ParallelCols -> estimateTime { image.parallelConvolveCols(filter, mode.batchSize) }
-        is ConvolutionMode.ParallelTiles -> estimateTime { image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }}
+        is ConvolutionMode.ParallelTiles -> estimateTime { image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }
+    }
 }
 
 private fun benchmarkSingleMode(
@@ -54,7 +65,7 @@ private fun loadOrGenerateImage(): Mat {
     }
 }
 
-//simply measuring execution time
+// simply measuring execution time
 fun main() {
     val inputImage = loadOrGenerateImage()
     println("Image size is ${inputImage.cols()}x${inputImage.rows()}")

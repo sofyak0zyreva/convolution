@@ -1,7 +1,12 @@
 package benchmarks
 
 import assertMatEquals
-import convolution.*
+import convolution.ConvolutionMode
+import convolution.parallelConvolveCols
+import convolution.parallelConvolvePixels
+import convolution.parallelConvolveRows
+import convolution.parallelConvolveTiles
+import convolution.seqConvolve
 import filters.Filter
 import filters.filterPool
 import org.bytedeco.opencv.global.opencv_imgcodecs
@@ -31,7 +36,8 @@ private fun benchmarkAllModes(
                 ConvolutionMode.ParallelPixels -> estimateTime { result = image.parallelConvolvePixels(filter) }
                 is ConvolutionMode.ParallelRows -> estimateTime { result = image.parallelConvolveRows(filter, mode.batchSize) }
                 is ConvolutionMode.ParallelCols -> estimateTime { result = image.parallelConvolveCols(filter, mode.batchSize) }
-                is ConvolutionMode.ParallelTiles -> estimateTime { result = image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }}
+                is ConvolutionMode.ParallelTiles -> estimateTime { result = image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }
+            }
             times += time
             if (verifyCorrectness) {
                 assertMatEquals(reference, result)
@@ -39,7 +45,7 @@ private fun benchmarkAllModes(
         }
         BenchmarkResult(
             mode = mode,
-            times = times,
+            times = times
         )
     }
 }

@@ -1,9 +1,11 @@
-import convolution.*
-import java.util.*
+import convolution.ConvolutionMode
+import convolution.convolveWithMode
+import convolution.seqConvolve
+import java.util.Random
 import kotlin.math.min
 import kotlin.test.Test
 
-class ParallelConvolutionTests{
+class ParallelConvTests {
     @Test
     fun `parallel convolution with random batch and tile sizes is the same as sequential`() {
         val imageHeight = Random().nextInt(imageSizeBound)
@@ -19,13 +21,7 @@ class ParallelConvolutionTests{
         )
         val filter = createRandomFilter(setRandomFilterSize())
         for (mode in modes) {
-            val parResult = when (mode) {
-                is ConvolutionMode.ParallelPixels -> image.parallelConvolvePixels(filter)
-                is ConvolutionMode.ParallelRows -> image.parallelConvolveRows(filter, mode.batchSize)
-                is ConvolutionMode.ParallelCols -> image.parallelConvolveCols(filter, mode.batchSize)
-                is ConvolutionMode.ParallelTiles -> image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight)
-                else -> image.seqConvolve(filter)
-            }
+            val parResult = image.convolveWithMode(filter, mode)
             val seqResult = image.seqConvolve(filter)
             assertMatEquals(seqResult, parResult)
         }
@@ -50,13 +46,7 @@ class ParallelConvolutionTests{
         )
         val filter = createRandomFilter(setRandomFilterSize())
         for (mode in modes) {
-            val parResult = when (mode) {
-                is ConvolutionMode.ParallelPixels -> image.parallelConvolvePixels(filter)
-                is ConvolutionMode.ParallelRows -> image.parallelConvolveRows(filter, mode.batchSize)
-                is ConvolutionMode.ParallelCols -> image.parallelConvolveCols(filter, mode.batchSize)
-                is ConvolutionMode.ParallelTiles -> image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight)
-                else -> image.seqConvolve(filter)
-            }
+            val parResult = image.convolveWithMode(filter, mode)
             val seqResult = image.seqConvolve(filter)
             assertMatEquals(seqResult, parResult)
         }

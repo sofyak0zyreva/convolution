@@ -23,7 +23,7 @@ fun createRandomImage(rows: Int, cols: Int): Mat {
 }
 
 fun createRandomFilter(size: Int): Filter {
-    require(size % 2 == 1) {"Kernel size must be odd"}
+    require(size % 2 == 1) { "Kernel size must be odd" }
     val kernel = Array(size) { DoubleArray(size) }
     val min = 0.0001
     val max = 10.0
@@ -74,7 +74,7 @@ fun padKernelWithZeros(filter: Filter, newSize: Int): Filter {
     require(newSize >= oldSize) { "New size must be >= old size" }
 
     val pad = (newSize - oldSize) / 2
-    val newKernel =  Array(newSize) { y ->
+    val newKernel = Array(newSize) { y ->
         DoubleArray(newSize) { x ->
             val ky = y - pad
             val kx = x - pad
@@ -121,7 +121,7 @@ fun loadRandomImageFromResources(): Mat {
     return opencv_imgcodecs.imread(randomFile.absolutePath)
 }
 
-//fun Mat.toArray2D(): Array<IntArray> {
+// fun Mat.toArray2D(): Array<IntArray> {
 //    val result = Array(rows()) { IntArray(cols()) }
 //    for (y in 0 until rows()) {
 //        for (x in 0 until cols()) {
@@ -129,4 +129,4 @@ fun loadRandomImageFromResources(): Mat {
 //        }
 //    }
 //    return result
-//}
+// }

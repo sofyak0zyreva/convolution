@@ -1,14 +1,14 @@
 import convolution.seqConvolve
 import filters.createBasicFilter
 import filters.filterPool
-import org.bytedeco.opencv.opencv_core.Mat
-import kotlin.test.Test
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.bytedeco.opencv.global.opencv_core.countNonZero
+import org.bytedeco.opencv.opencv_core.Mat
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import java.util.*
+import kotlin.test.Test
 
-class SequentialConvolutionTestsWithRandomImages{
+class SequentialConvolutionTestsWithRandomImages {
     private lateinit var image: Mat
 
     @BeforeEach
@@ -67,10 +67,9 @@ class SequentialConvolutionTestsWithRandomImages{
         val composedResult = image.seqConvolve(composedKernel)
         assertMatEquals(seqResult, composedResult, 1)
     }
-
 }
 
-class SequentialConvolutionTestsWithTestImages{
+class SequentialConvolutionTestsWithTestImages {
     private lateinit var image: Mat
 
     @BeforeEach
@@ -127,5 +126,4 @@ class SequentialConvolutionTestsWithTestImages{
         val composedResult = image.seqConvolve(composedKernel)
         assertMatEquals(seqResult, composedResult, 1)
     }
-
 }
