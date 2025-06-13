@@ -24,7 +24,7 @@ private fun benchmarkAllModes(
         ConvolutionMode.ParallelPixels,
         ConvolutionMode.ParallelRows(batchSize = 4),
         ConvolutionMode.ParallelCols(batchSize = 8),
-        ConvolutionMode.ParallelTiles(tileWidth = 4, tileHeight = 4)
+        ConvolutionMode.ParallelTiles(tileWidth = 8, tileHeight = 8)
     )
     val reference = image.seqConvolve(filter)
     return modes.map { mode ->
