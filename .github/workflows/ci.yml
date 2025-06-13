@@ -1,4 +1,4 @@
-name: BKotlin CI
+name: Kotlin CI
 
 on: [push, pull_request]
 
