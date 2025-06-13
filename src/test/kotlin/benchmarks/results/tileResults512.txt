@@ -1,0 +1,35 @@
+Mode: par_tiles_1x1
+  Average Time:          0.3017 s
+  Std Error Of The Mean: 0.0221 s
+
+Mode: par_tiles_4x4
+  Average Time:          0.2319 s
+  Std Error Of The Mean: 0.0017 s
+
+Mode: par_tiles_8x8
+  Average Time:          0.2313 s
+  Std Error Of The Mean: 0.0005 s
+
+Mode: par_tiles_16x16
+  Average Time:          0.2335 s
+  Std Error Of The Mean: 0.0011 s
+
+Mode: par_tiles_32x32
+  Average Time:          0.2373 s
+  Std Error Of The Mean: 0.0009 s
+
+Mode: par_tiles_64x64
+  Average Time:          0.3396 s
+  Std Error Of The Mean: 0.0350 s
+
+Mode: par_tiles_128x128
+  Average Time:          0.2824 s
+  Std Error Of The Mean: 0.0063 s
+
+Mode: par_tiles_256x256
+  Average Time:          0.3800 s
+  Std Error Of The Mean: 0.0088 s
+
+Mode: par_tiles_512x512
+  Average Time:          1.2037 s
+  Std Error Of The Mean: 0.0042 s

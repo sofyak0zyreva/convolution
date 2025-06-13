@@ -1,0 +1,35 @@
+Mode: par_cols_1
+  Average Time:          0.3195 s
+  Std Error Of The Mean: 0.0358 s
+
+Mode: par_cols_4
+  Average Time:          0.2608 s
+  Std Error Of The Mean: 0.0223 s
+
+Mode: par_cols_8
+  Average Time:          0.2381 s
+  Std Error Of The Mean: 0.0028 s
+
+Mode: par_cols_16
+  Average Time:          0.2387 s
+  Std Error Of The Mean: 0.0020 s
+
+Mode: par_cols_32
+  Average Time:          0.2436 s
+  Std Error Of The Mean: 0.0038 s
+
+Mode: par_cols_64
+  Average Time:          0.2468 s
+  Std Error Of The Mean: 0.0039 s
+
+Mode: par_cols_128
+  Average Time:          0.3221 s
+  Std Error Of The Mean: 0.0019 s
+
+Mode: par_cols_256
+  Average Time:          0.6102 s
+  Std Error Of The Mean: 0.0019 s
+
+Mode: par_cols_512
+  Average Time:          1.1986 s
+  Std Error Of The Mean: 0.0013 s

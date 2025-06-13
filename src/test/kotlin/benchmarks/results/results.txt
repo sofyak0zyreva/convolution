@@ -1,0 +1,188 @@
+=== Filter: blur_3x3 ===
+Mode: seq
+  Average Time:          1.6081 s
+  Std Error Of The Mean: 0.0014 s
+
+Mode: pixels
+  Average Time:          0.5313 s
+  Std Error Of The Mean: 0.0580 s
+
+Mode: rows
+  Average Time:          0.3004 s
+  Std Error Of The Mean: 0.0021 s
+
+Mode: cols
+  Average Time:          0.3146 s
+  Std Error Of The Mean: 0.0027 s
+
+Mode: tiles
+  Average Time:          0.3219 s
+  Std Error Of The Mean: 0.0023 s
+
+=== Filter: blur_5x5 ===
+Mode: seq
+  Average Time:          4.3044 s
+  Std Error Of The Mean: 0.0383 s
+
+Mode: pixels
+  Average Time:          1.0216 s
+  Std Error Of The Mean: 0.0137 s
+
+Mode: rows
+  Average Time:          0.7981 s
+  Std Error Of The Mean: 0.0087 s
+
+Mode: cols
+  Average Time:          1.0822 s
+  Std Error Of The Mean: 0.0614 s
+
+Mode: tiles
+  Average Time:          0.9179 s
+  Std Error Of The Mean: 0.0203 s
+
+=== Filter: identity ===
+Mode: seq
+  Average Time:          1.7129 s
+  Std Error Of The Mean: 0.0354 s
+
+Mode: pixels
+  Average Time:          0.6443 s
+  Std Error Of The Mean: 0.0476 s
+
+Mode: rows
+  Average Time:          0.3786 s
+  Std Error Of The Mean: 0.0156 s
+
+Mode: cols
+  Average Time:          0.4169 s
+  Std Error Of The Mean: 0.0215 s
+
+Mode: tiles
+  Average Time:          0.3459 s
+  Std Error Of The Mean: 0.0058 s
+
+=== Filter: sharpen ===
+Mode: seq
+  Average Time:          2.1195 s
+  Std Error Of The Mean: 0.1261 s
+
+Mode: pixels
+  Average Time:          0.5690 s
+  Std Error Of The Mean: 0.0144 s
+
+Mode: rows
+  Average Time:          0.3979 s
+  Std Error Of The Mean: 0.0100 s
+
+Mode: cols
+  Average Time:          0.4067 s
+  Std Error Of The Mean: 0.0151 s
+
+Mode: tiles
+  Average Time:          0.4108 s
+  Std Error Of The Mean: 0.0130 s
+
+=== Filter: edge_detect ===
+Mode: seq
+  Average Time:          1.8866 s
+  Std Error Of The Mean: 0.0472 s
+
+Mode: pixels
+  Average Time:          0.5391 s
+  Std Error Of The Mean: 0.0153 s
+
+Mode: rows
+  Average Time:          0.3836 s
+  Std Error Of The Mean: 0.0195 s
+
+Mode: cols
+  Average Time:          0.3488 s
+  Std Error Of The Mean: 0.0072 s
+
+Mode: tiles
+  Average Time:          0.3564 s
+  Std Error Of The Mean: 0.0046 s
+
+=== Filter: motion_blur ===
+Mode: seq
+  Average Time:          13.6759 s
+  Std Error Of The Mean: 0.1060 s
+
+Mode: pixels
+  Average Time:          3.5089 s
+  Std Error Of The Mean: 0.1241 s
+
+Mode: rows
+  Average Time:          3.1946 s
+  Std Error Of The Mean: 0.0633 s
+
+Mode: cols
+  Average Time:          3.0761 s
+  Std Error Of The Mean: 0.0428 s
+
+Mode: tiles
+  Average Time:          3.1471 s
+  Std Error Of The Mean: 0.0539 s
+
+=== Filter: gaussian_blur_3x3 ===
+Mode: seq
+  Average Time:          1.6853 s
+  Std Error Of The Mean: 0.0503 s
+
+Mode: pixels
+  Average Time:          0.5107 s
+  Std Error Of The Mean: 0.0230 s
+
+Mode: rows
+  Average Time:          0.3372 s
+  Std Error Of The Mean: 0.0043 s
+
+Mode: cols
+  Average Time:          0.3858 s
+  Std Error Of The Mean: 0.0137 s
+
+Mode: tiles
+  Average Time:          0.3628 s
+  Std Error Of The Mean: 0.0118 s
+
+=== Filter: gaussian_blur_5x5 ===
+Mode: seq
+  Average Time:          4.5076 s
+  Std Error Of The Mean: 0.0923 s
+
+Mode: pixels
+  Average Time:          1.1993 s
+  Std Error Of The Mean: 0.0327 s
+
+Mode: rows
+  Average Time:          0.9540 s
+  Std Error Of The Mean: 0.0123 s
+
+Mode: cols
+  Average Time:          1.1097 s
+  Std Error Of The Mean: 0.0369 s
+
+Mode: tiles
+  Average Time:          1.2924 s
+  Std Error Of The Mean: 0.0477 s
+
+=== Filter: emboss ===
+Mode: seq
+  Average Time:          4.2973 s
+  Std Error Of The Mean: 0.0412 s
+
+Mode: pixels
+  Average Time:          1.2003 s
+  Std Error Of The Mean: 0.0660 s
+
+Mode: rows
+  Average Time:          1.0467 s
+  Std Error Of The Mean: 0.0520 s
+
+Mode: cols
+  Average Time:          0.9425 s
+  Std Error Of The Mean: 0.0150 s
+
+Mode: tiles
+  Average Time:          1.0817 s
+  Std Error Of The Mean: 0.0644 s
