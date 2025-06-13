@@ -10,11 +10,11 @@ import java.util.*
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
-inline fun estimateTime(block: () -> Unit) : Double {
+internal inline fun estimateTime(block: () -> Unit) : Double {
     return measureTime { block() }.toDouble(DurationUnit.SECONDS)
 }
 
-fun measureSingleModeTime(image: Mat, mode: ConvolutionMode, filter: Filter): Double {
+internal fun measureSingleModeTime(image: Mat, mode: ConvolutionMode, filter: Filter): Double {
     return when (mode) {
         ConvolutionMode.Sequential -> estimateTime { image.seqConvolve(filter) }
         ConvolutionMode.ParallelPixels -> estimateTime { image.parallelConvolvePixels(filter) }
@@ -23,7 +23,7 @@ fun measureSingleModeTime(image: Mat, mode: ConvolutionMode, filter: Filter): Do
         is ConvolutionMode.ParallelTiles -> estimateTime { image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }}
 }
 
-fun benchmarkSingleMode(
+private fun benchmarkSingleMode(
     image: Mat,
     filter: Filter,
     mode: ConvolutionMode,
@@ -33,7 +33,7 @@ fun benchmarkSingleMode(
     return BenchmarkResult(mode, times)
 }
 
-fun loadOrGenerateImage(): Mat {
+private fun loadOrGenerateImage(): Mat {
     println("\nChoose to load or generate an image:")
     val options = listOf("load image", "create random image")
 

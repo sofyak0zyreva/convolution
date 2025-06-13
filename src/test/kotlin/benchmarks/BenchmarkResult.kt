@@ -3,7 +3,7 @@ package benchmarks
 import convolution.ConvolutionMode
 import kotlin.math.sqrt
 
-data class BenchmarkResult(
+internal data class BenchmarkResult(
     val mode: ConvolutionMode,
     val times: List<Double>,
 ) {

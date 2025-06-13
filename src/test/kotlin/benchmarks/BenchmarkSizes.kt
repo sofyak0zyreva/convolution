@@ -8,7 +8,7 @@ import org.bytedeco.opencv.opencv_core.Mat
 
 // function to measure execution time with different batch or tile sizes
 // to then choose the most optimal one to compare across all convolution implementations
-fun benchmarkSizes(
+private fun benchmarkSizes(
     image: Mat,
     filter: Filter,
     modeFactory: (Int) -> ConvolutionMode,

@@ -4,7 +4,7 @@ import filters.filterPool
 import org.bytedeco.javacpp.Loader
 import java.io.File
 
-private fun promptForImagePath(): String {
+fun promptForImagePath(): String {
     while (true) {
         print("Enter path to image (e.g., sample.bmp): ")
         val path = readlnOrNull()?.trim()
@@ -21,7 +21,7 @@ private fun promptForImagePath(): String {
     }
 }
 
-private fun promptForFilterName(): String {
+fun promptForFilterName(): String {
     val filterNames = filterPool.keys.toList()
 
     while (true) {
@@ -40,7 +40,7 @@ private fun promptForFilterName(): String {
     }
 }
 
-private fun promptForMode(): ConvolutionMode {
+fun promptForMode(): ConvolutionMode {
     val options = listOf(
         "sequential",
         "parallel pixels",
@@ -60,13 +60,13 @@ private fun promptForMode(): ConvolutionMode {
             0 -> return ConvolutionMode.Sequential
             1 -> return ConvolutionMode.ParallelPixels
             2 -> {
-                print("Enter batch size [default 32]: ")
-                val batch = readlnOrNull()?.toIntOrNull() ?: 32
+                print("Enter batch size [default 1 -- per row]: ")
+                val batch = readlnOrNull()?.toIntOrNull() ?: 1
                 return ConvolutionMode.ParallelRows(batch)
             }
             3 -> {
-                print("Enter batch size [default 32]: ")
-                val batch = readlnOrNull()?.toIntOrNull() ?: 32
+                print("Enter batch size [default 1 -- per column]: ")
+                val batch = readlnOrNull()?.toIntOrNull() ?: 1
                 return ConvolutionMode.ParallelCols(batch)
             }
             4 -> {

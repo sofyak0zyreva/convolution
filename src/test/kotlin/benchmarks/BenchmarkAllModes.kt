@@ -8,7 +8,7 @@ import org.bytedeco.opencv.global.opencv_imgcodecs
 import org.bytedeco.opencv.opencv_core.Mat
 
 // function that compares execution times of all convolution implementations
-fun benchmarkAllModes(
+private fun benchmarkAllModes(
     image: Mat,
     filter: Filter,
     runs: Int = 10,
