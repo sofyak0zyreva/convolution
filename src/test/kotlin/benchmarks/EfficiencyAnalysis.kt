@@ -1,138 +1,70 @@
 package benchmarks
 
-import assertMatEquals
 import convolution.*
-import createRandomFilter
 import createRandomImage
 import filters.Filter
 import filters.filterPool
+import imageSizeBound
 import org.bytedeco.opencv.opencv_core.Mat
-import kotlin.math.sqrt
+import java.util.*
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
-
-data class BenchmarkResult(
-    val mode: ConvolutionMode,
-    val times: List<Double>,
-) {
-    private val n: Int get() = times.size
-    private val average: Double get() = times.average()
-    private val stdDev: Double get() = sqrt(times.sumOf { (it - average).let { d -> d * d } } / (n - 1))
-    private val stdErrorOfTheMean: Double get() = stdDev / sqrt(n.toDouble())
-
-    override fun toString(): String {
-        return buildString {
-            appendLine("Mode: $mode")
-            appendLine("  Average Time:          %.4f s".format(average))
-            appendLine("  Std Error Of The Mean: %.4f s".format(stdErrorOfTheMean))
-        }
-    }
-}
 
 inline fun estimateTime(block: () -> Unit) : Double {
     return measureTime { block() }.toDouble(DurationUnit.SECONDS)
 }
 
-fun benchmarkSizes(
+fun measureSingleModeTime(image: Mat, mode: ConvolutionMode, filter: Filter): Double {
+    return when (mode) {
+        ConvolutionMode.Sequential -> estimateTime { image.seqConvolve(filter) }
+        ConvolutionMode.ParallelPixels -> estimateTime { image.parallelConvolvePixels(filter) }
+        is ConvolutionMode.ParallelRows -> estimateTime { image.parallelConvolveRows(filter, mode.batchSize) }
+        is ConvolutionMode.ParallelCols -> estimateTime { image.parallelConvolveCols(filter, mode.batchSize) }
+        is ConvolutionMode.ParallelTiles -> estimateTime { image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }}
+}
+
+fun benchmarkSingleMode(
     image: Mat,
     filter: Filter,
-    modeFactory: (Int) -> ConvolutionMode,
-    sizesToTry: List<Int>,
+    mode: ConvolutionMode,
     runs: Int = 10
-): List<BenchmarkResult> {
-    return sizesToTry.map { size ->
-        val mode = modeFactory(size)
-        val times = List(runs) {
-            when (mode) {
-                ConvolutionMode.Sequential -> estimateTime { image.seqConvolve(filter) }
-                ConvolutionMode.ParallelPixels -> estimateTime { image.parallelConvolvePixels(filter) }
-                is ConvolutionMode.ParallelRows -> estimateTime { image.parallelConvolveRows(filter, mode.batchSize) }
-                is ConvolutionMode.ParallelCols -> estimateTime { image.parallelConvolveCols(filter, mode.batchSize) }
-                is ConvolutionMode.ParallelTiles -> estimateTime { image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }}
-        }
-        BenchmarkResult(mode, times)
-    }
+): BenchmarkResult {
+    val times = List(runs) { measureSingleModeTime(image, mode, filter) }
+    return BenchmarkResult(mode, times)
 }
 
-fun benchmarkAllModes(
-    image: Mat,
-    filter: Filter,
-    runs: Int = 10,
-    verifyCorrectness: Boolean = true
-): List<BenchmarkResult> {
-    val modes = listOf(
-        ConvolutionMode.Sequential,
-        ConvolutionMode.ParallelPixels,
-        ConvolutionMode.ParallelRows(batchSize = 4),
-        ConvolutionMode.ParallelCols(batchSize = 8),
-        ConvolutionMode.ParallelTiles(tileWidth = 4, tileHeight = 4)
-    )
-    val reference = image.seqConvolve(filter)
-    return modes.map { mode ->
-        val times = mutableListOf<Double>()
-        var result = image
-        repeat(runs) {
-            val time = when (mode) {
-                ConvolutionMode.Sequential -> estimateTime { result = image.seqConvolve(filter) }
-                ConvolutionMode.ParallelPixels -> estimateTime { result = image.parallelConvolvePixels(filter) }
-                is ConvolutionMode.ParallelRows -> estimateTime { result = image.parallelConvolveRows(filter, mode.batchSize) }
-                is ConvolutionMode.ParallelCols -> estimateTime { result = image.parallelConvolveCols(filter, mode.batchSize) }
-                is ConvolutionMode.ParallelTiles -> estimateTime { result = image.parallelConvolveTiles(filter, mode.tileWidth, mode.tileHeight) }}
-            times += time
-            if (verifyCorrectness) {
-                assertMatEquals(reference, result)
+fun loadOrGenerateImage(): Mat {
+    println("\nChoose to load or generate an image:")
+    val options = listOf("load image", "create random image")
+
+    options.forEachIndexed { index, name ->
+        println("  [$index] $name")
+    }
+    while (true) {
+        print("Select mode index: ")
+        when (readlnOrNull()?.toIntOrNull()) {
+            0 -> return loadImage(promptForImagePath()).toGrayscale()
+            1 -> {
+                print("Enter image size (it's square) [skip to choose random]: ")
+                val size = readlnOrNull()?.toIntOrNull() ?: Random().nextInt(imageSizeBound)
+                return createRandomImage(size, size)
             }
+            else -> println("❌ Invalid index. Please enter a number from the list.")
         }
-        BenchmarkResult(
-            mode = mode,
-            times = times,
-        )
     }
 }
 
-
+//simply measuring execution time
 fun main() {
-    val testImage = createRandomImage(512, 512)
-//    val testFilter = createRandomFilter(5)
-//
-//    val testSizes = listOf(
-//        1,
-//        4,
-//        8,
-//        16,
-//        32,
-//        64,
-//        128,
-//        256,
-//        512
-//    )
-//
-//    val benchmarkOptimalSize: ((Int) -> ConvolutionMode) -> List<BenchmarkResult> = { modeFactory ->
-//        benchmarkSizes(
-//            image = testImage,
-//            filter = testFilter,
-//            sizesToTry = testSizes,
-//            modeFactory = modeFactory
-//        )
-//    }
-//    val rowResult = benchmarkOptimalSize { ConvolutionMode.ParallelRows(it) }
-//    val colResult = benchmarkOptimalSize { ConvolutionMode.ParallelCols(it) }
-//    val tileResult = benchmarkOptimalSize { size -> ConvolutionMode.ParallelTiles(size, size) }
-//    rowResult.forEach(::println)
-//    colResult.forEach(::println)
-//    tileResult.forEach(::println)
+    val inputImage = loadOrGenerateImage()
+    println("Image size is ${inputImage.cols()}x${inputImage.rows()}")
+    val selectedMode = promptForMode()
 
-    val allResults = mutableMapOf<String, List<BenchmarkResult>>()
-    for ((filterName, filter) in filterPool) {
-        val results = benchmarkAllModes(
-            image = testImage,
-            filter = filter
-        )
-        allResults[filterName] = results
-    }
+    val filterName = promptForFilterName()
+    val filter = filterPool[filterName] ?: throw IllegalArgumentException("Filter should not be null.")
+    println("Applying filter: $filterName...")
 
-    allResults.forEach { (filterName, results) ->
-        println("=== Filter: $filterName ===")
-        results.forEach(::println)
-    }
+    val result = benchmarkSingleMode(inputImage, filter, selectedMode)
+    println("Performance information:")
+    println(result)
 }
