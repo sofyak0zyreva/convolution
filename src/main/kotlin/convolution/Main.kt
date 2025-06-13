@@ -99,7 +99,8 @@ fun main() {
         println("Applying filter: $filterName...")
 
         val resultImage = grayImage.convolveWithMode(filter, selectedMode)
-        val outputPath = "output_${filename}_${filterName}_$modeName.bmp"
+        File("output").apply { mkdirs() }
+        val outputPath = "output${File.separator}${filename}_${filterName}_$modeName.bmp"
         saveImage(resultImage, outputPath)
         println("✅ Done! Output saved to: $outputPath")
     } catch (e: Exception) {
