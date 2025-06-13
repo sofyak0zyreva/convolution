@@ -13,8 +13,10 @@ fun Mat.parallelConvolvePixels(filter: Filter): Mat = runBlocking {
     val output = Mat(rows(), cols(), CV_8UC1)
 
     for (y in 0 until rows()) { for (x in 0 until cols()) {
-        // launch( ... ) launches a new coroutine for this batch
-        launch {
+        // launch{ ... } launches a new coroutine for this batch
+        // Dispatchers.Default:
+        // the coroutine will run on a background thread pool, these threads are shared across the app
+        launch(Dispatchers.Default) {
             val pixelValue = convolvePixel(x, y, filter, this@parallelConvolvePixels)
             output.ptr(y, x).put(pixelValue)
         }
@@ -22,7 +24,7 @@ fun Mat.parallelConvolvePixels(filter: Filter): Mat = runBlocking {
     return@runBlocking output
 }
 
-fun Mat.parallelConvolveRows(filter: Filter, batchSize: Int = 32): Mat = runBlocking {
+fun Mat.parallelConvolveRows(filter: Filter, batchSize: Int): Mat = runBlocking {
     checkFilterSize(filter)
     val output = Mat(rows(), cols(), CV_8UC1)
 
@@ -40,7 +42,7 @@ fun Mat.parallelConvolveRows(filter: Filter, batchSize: Int = 32): Mat = runBloc
     return@runBlocking output
 }
 
-fun Mat.parallelConvolveCols(filter: Filter, batchSize: Int = 32): Mat = runBlocking {
+fun Mat.parallelConvolveCols(filter: Filter, batchSize: Int): Mat = runBlocking {
     checkFilterSize(filter)
     val output = Mat(rows(), cols(), CV_8UC1)
 
@@ -48,7 +50,7 @@ fun Mat.parallelConvolveCols(filter: Filter, batchSize: Int = 32): Mat = runBloc
     for (i in 0 until numBatches) {
         val startColumn = i * batchSize
         val endColumn = min(startColumn + batchSize, cols())
-        launch {
+        launch(Dispatchers.Default) {
             for (x in startColumn until endColumn) { for (y in 0 until rows()) {
                 val pixelValue = convolvePixel(x, y, filter, this@parallelConvolveCols)
                 output.ptr(y, x).put(pixelValue)
@@ -58,13 +60,13 @@ fun Mat.parallelConvolveCols(filter: Filter, batchSize: Int = 32): Mat = runBloc
     return@runBlocking output
 }
 
-fun Mat.parallelConvolveTiles(filter: Filter, tileWidth: Int = 64, tileHeight: Int = 64): Mat = runBlocking {
+fun Mat.parallelConvolveTiles(filter: Filter, tileWidth: Int, tileHeight: Int): Mat = runBlocking {
     checkFilterSize(filter)
     val output = Mat(rows(), cols(), CV_8UC1)
 
     for (tileY in 0 until rows() step tileHeight) {
         for (tileX in 0 until cols() step tileWidth) {
-            launch {
+            launch(Dispatchers.Default) {
                 val endY = min(tileY + tileHeight, rows())
                 val endX = min(tileX + tileWidth, cols())
                 for (y in tileY until endY) { for (x in tileX until endX) {
