@@ -3,7 +3,7 @@ import org.bytedeco.opencv.global.opencv_core
 import org.bytedeco.opencv.global.opencv_imgcodecs
 import org.bytedeco.opencv.opencv_core.Mat
 import java.io.File
-import java.util.*
+import java.util.Random
 import kotlin.math.abs
 
 const val imageSizeBound = 2400

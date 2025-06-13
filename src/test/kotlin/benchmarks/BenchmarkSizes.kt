@@ -1,6 +1,6 @@
 package benchmarks
 
-import convolution.*
+import convolution.ConvolutionMode
 import createRandomFilter
 import createRandomImage
 import filters.Filter

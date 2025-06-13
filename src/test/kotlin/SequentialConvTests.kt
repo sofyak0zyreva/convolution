@@ -5,7 +5,7 @@ import org.bytedeco.opencv.global.opencv_core.countNonZero
 import org.bytedeco.opencv.opencv_core.Mat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import java.util.*
+import java.util.Random
 import kotlin.test.Test
 
 class SequentialConvolutionTestsWithRandomImages {
