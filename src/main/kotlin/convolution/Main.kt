@@ -1,23 +1,52 @@
 package convolution
 
 import filters.filterPool
-import org.bytedeco.javacpp.Loader
 import java.io.File
 
-fun promptForImagePath(): String {
+fun promptForImageOrDir(): List<String> {
     while (true) {
-        print("Enter path to image (e.g., sample.bmp): ")
-        val path = readlnOrNull()?.trim()
-        if (!path.isNullOrBlank()) {
+        print("Enter path to image or directory: ")
+        val input = readlnOrNull()?.trim()
+
+        if (input.isNullOrBlank()) {
+            println("❌ Path cannot be empty.")
+            continue
+        }
+
+        val file = File(input)
+
+        if (!file.exists()) {
+            println("❌ Path does not exist: $input")
+            continue
+        }
+
+        // Single image file
+        if (file.isFile) {
             try {
-                loadImage(path) // check if image is valid
-                return path
+                loadImage(file.absolutePath) // check if image is valid
+                return listOf(file.absolutePath)
             } catch (e: Exception) {
                 println("❌ Cannot load image. Reason: ${e.message}")
+                continue
             }
-        } else {
-            println("❌ Path cannot be empty.")
         }
+
+        // Directory
+        if (file.isDirectory) {
+            val files = file.listFiles { f -> f.isFile }
+                ?.map { it.absolutePath }
+                ?.sorted()
+                ?: emptyList()
+
+            if (files.isEmpty()) {
+                println("❌ Directory is empty. No images to process.")
+                continue
+            }
+
+            return files
+        }
+
+        println("❌ Not a valid file or directory: $input")
     }
 }
 
@@ -82,27 +111,41 @@ fun promptForMode(): ConvolutionMode {
 }
 
 fun main() {
-    Loader.load(org.bytedeco.opencv.global.opencv_imgcodecs::class.java)
-
+//    val imagePaths = listOf(
+//        "src/main/resources/images/bird.bmp",
+//        "src/main/resources/images/scenery.bmp",
+//        "src/main/resources/images/cat.bmp",
+//        "src/main/resources/images/cat.bmp",
+//        "src/main/resources/images/cat.bmp",
+//        "src/main/resources/images/cat.bmp",
+//        "src/main/resources/images/cat.bmp",
+//        "src/main/resources/images/cat.bmp",
+//        "src/main/resources/images/cat.bmp",
+//        "src/main/resources/images/cat.bmp"
+//    )
     try {
-        val imagePath = promptForImagePath()
-        val inputImage = loadImage(imagePath)
-        val grayImage = inputImage.toGrayscale()
-        val filename = File(imagePath).nameWithoutExtension
-
-        println("Image size is ${grayImage.cols()}x${grayImage.rows()}")
+        val imagePaths = promptForImageOrDir()
+        val imageNum = imagePaths.size
         val selectedMode = promptForMode()
-        val modeName = selectedMode.toString()
-
         val filterName = promptForFilterName()
         val filter = filterPool[filterName] ?: throw IllegalArgumentException("Filter should not be null.")
         println("Applying filter: $filterName...")
 
-        val resultImage = grayImage.convolveWithMode(filter, selectedMode)
-        File("output").apply { mkdirs() }
-        val outputPath = "output${File.separator}${filename}_${filterName}_$modeName.bmp"
-        saveImage(resultImage, outputPath)
-        println("✅ Done! Output saved to: $outputPath")
+        if (imageNum == 1) {
+            val imagePath = imagePaths[0]
+            val inputImage = loadImage(imagePath)
+            val grayImage = inputImage.toGrayscale()
+            val filename = File(imagePath).nameWithoutExtension
+            val resultImage = grayImage.convolveWithMode(filter, selectedMode)
+            File("output").apply { mkdirs() }
+            val modeName = selectedMode.toString()
+            val outputPath = "output${File.separator}${filename}_${filterName}_$modeName.bmp"
+            saveImage(resultImage, outputPath)
+            println("✅ Done! Output saved to: $outputPath")
+        } else {
+            runAsyncPipeline(imagePaths, filter, filterName, selectedMode)
+            println("✅ Pipeline finished")
+        }
     } catch (e: Exception) {
         System.err.println("❌ Error: ${e.message}")
     }
