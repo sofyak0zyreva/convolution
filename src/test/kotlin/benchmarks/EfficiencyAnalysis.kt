@@ -7,7 +7,6 @@ import convolution.parallelConvolvePixels
 import convolution.parallelConvolveRows
 import convolution.parallelConvolveTiles
 import convolution.promptForFilterName
-import convolution.promptForImagePath
 import convolution.promptForMode
 import convolution.seqConvolve
 import convolution.toGrayscale
@@ -19,6 +18,23 @@ import org.bytedeco.opencv.opencv_core.Mat
 import java.util.Random
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
+
+fun promptForImagePath(): String {
+    while (true) {
+        print("Enter path to image (e.g., sample.bmp): ")
+        val path = readlnOrNull()?.trim()
+        if (!path.isNullOrBlank()) {
+            try {
+                loadImage(path) // check if image is valid
+                return path
+            } catch (e: Exception) {
+                println("❌ Cannot load image. Reason: ${e.message}")
+            }
+        } else {
+            println("❌ Path cannot be empty.")
+        }
+    }
+}
 
 internal inline fun estimateTime(block: () -> Unit): Double {
     return measureTime { block() }.toDouble(DurationUnit.SECONDS)
