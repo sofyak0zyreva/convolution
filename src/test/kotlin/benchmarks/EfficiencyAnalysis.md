@@ -40,3 +40,25 @@ The standard error of the mean (SEM) values were generally low across all modes,
 ### Conclusion
 
 Structured parallel approaches — particularly **row-based** and **tile-based** — offered the best performance and reliability across all filters and image types. Pixel-wise parallelism, despite being conceptually simple, proved inefficient in practice.
+
+# Performance Analysis of Pipelines
+
+## 1. Tuning Concurrency: Async Pipeline
+
+The asynchronous pipeline allows multiple worker coroutines to perform image convolutions in parallel. Different values of concurrency (the number of simultaneous convolution workers) were tested, using the same filter (`gaussian_blur_3x3`) across the same [set of images](https://github.com/sofyak0zyreva/convolution/tree/main/src/main/resources/images).
+
+### Observations
+
+Increasing the number of workers generally reduces processing time for modes that split work by rows, columns, or tiles. For a typical CPU with 8 cores, **8 concurrent workers** is a reasonable maximum for testing, balancing CPU utilization and memory usage.
+
+## 2. Comparing Pipelines
+
+Fully sequential pipeline (reading, convolving, writing images one by one) was compared to the asynchronous pipeline (streaming images through reading → convolution → writing, with buffered and parallelized convolution stages).
+
+### Async vs. Seq Pipeline Performance
+
+**Async pipeline excels** when convolution can be parallelized across multiple images or within a single image (rows, columns, tiles). **Sequential pipeline** is simpler but suffers from total runtime inflation because the reading, convolution, and writing stages are not overlapped. For highly parallelizable convolution modes, async pipelines with reasonable concurrency (e.g., 8 workers) are **twice or even three times faster** compared to sequential execution. **Parallel pixels mode** can occasionally be slower in async pipelines because it aggressively splits work at the pixel level, increasing memory pressure and overhead from many small tasks.
+
+### Conclusion
+
+Asynchronous pipeline with controlled concurrency is optimal for large-scale image processing, while sequential pipelines remain useful for simple or memory-constrained scenarios.
