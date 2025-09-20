@@ -1,13 +1,17 @@
 package convolution
 
-import java.io.File
-import kotlinx.coroutines.flow.*
+import filters.Filter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.withContext
 import org.bytedeco.opencv.opencv_core.Mat
+import java.io.File
 
-import filters.Filter
 // --- Reader ---
 fun readImages(paths: List<String>): Flow<Pair<String, Mat>> = flow {
     for (path in paths) {

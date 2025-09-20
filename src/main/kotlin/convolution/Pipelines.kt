@@ -1,9 +1,11 @@
 package convolution
 
-import java.io.File
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import filters.Filter
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.runBlocking
+import java.io.File
 
 fun runAsyncPipeline(
     paths: List<String>,
