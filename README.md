@@ -4,11 +4,12 @@ This project implements and benchmarks sequential and several parallel approache
 
 ## ✨ Features
 
-- Sequential and parallel convolution 
+- Sequential and parallel convolution
 - Interactive CLI tool for applying filters to images
 - Performance benchmarking and analysis
 - Predefined filters
 - Support for user-supplied or built-in test images
+- Convolve several images at once using sequential or asynchronous pipeline
 
 ## Built-in Filters
 
@@ -32,13 +33,21 @@ All filters are defined as 2D matrices (kernels), with optional normalization (`
 | `cols`   | Columns processed in parallel          |
 | `tiles`  | Blocks (tiles) of the image      |
 
+## Types of Pipelines
+
+| Mode     | Description                      |
+| -------- | -------------------------------- |
+| `seq`    | Convolve one image at a time using any mode |
+| `async` | Convolve several images simultaneously         |
+
+
 ## 🧪 Requirements
 
 - JDK 17+
 - Kotlin
 - Gradle
 - OpenCV via [JavaCPP](https://github.com/bytedeco/javacpp)
-  
+
 ## Getting started
 Clone the repo:
 ```bash
@@ -62,13 +71,13 @@ You'll be prompted to:
 
 1. Enter an image path (or use defaults from _resources/images/_). You can enter path from the repository root or absolute path
 2. Select a mode (with optional batch/tile sizes -- they are responsible for how many pixels will be allocated per coroutine)
-3. Choose a filter 
+3. Choose a filter
 
 The result will be saved as a new `.bmp` file in the project directory's `output` folder.
 
 
 ## 🧵 Performance Benchmarking
-You can simply run `main()` in the specified file.
+You can simply run `main()` in the specified file (simplest for `BenchmarkPipelines.kt`).
 
 To measure the performance of a specific mode (`BenchmarkSizes.kt`):
 
@@ -97,14 +106,14 @@ benchmarkSizes(image, filter, { ConvolutionMode.ParallelRows(8) }, sizes)
 ## ✅ Testing & Correctness
 
 * Sequential implementation serves as the reference with key points preserved:
-  - Compositionality: applying filters sequentially should equal applying their composition  
-  (e.g., `apply(filter1, apply(filter2, img)) == apply(filter1 ⊕ filter2, img)`)
-  - Identity: some filters compose to identity (e.g., _shift-left _then_ shift-right_)
-  - Zero-padding: expanding filters with zeros shouldn't change results
-  - Known-output filters: test with trivial filters (_zero filter, identity filter_)
+    - Compositionality: applying filters sequentially should equal applying their composition  
+      (e.g., `apply(filter1, apply(filter2, img)) == apply(filter1 ⊕ filter2, img)`)
+    - Identity: some filters compose to identity (e.g., _shift-left _then_ shift-right_)
+    - Zero-padding: expanding filters with zeros shouldn't change results
+    - Known-output filters: test with trivial filters (_zero filter, identity filter_)
 * All modes are tested against the sequential implementation for numerical accuracy
 * Standard Error of the Mean (SEM) is reported in benchmarks. See [Performance Analysis](./src/test/kotlin/benchmarks/EfficiencyAnalysis.md),
-[Plots](./src/test/kotlin/benchmarks/plots), and [Results](./src/test/kotlin/benchmarks/results) for more
+  [Plots](./src/test/kotlin/benchmarks/plots), and [Results](./src/test/kotlin/benchmarks/results) for more
 
 Run:
 
@@ -117,12 +126,12 @@ Run:
 ```
 src/
 ├── main/
-│   ├── kotlin/           ← Core logic, filters, modes, and CLI
+│   ├── kotlin/           ← Core logic, filters, modes, pipelines and CLI
 │   └── resources/
 │       └── images/       ← Sample input images
 └── test/
     └── kotlin/
-        ├── benchmark/    ← Performance analysis, plots, results
+        ├── benchmarks/    ← Performance analysis, plots, results
         └── ...           ← Tests
 
 ```
