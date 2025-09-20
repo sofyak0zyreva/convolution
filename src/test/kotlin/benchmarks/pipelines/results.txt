@@ -1,0 +1,41 @@
+=== Pipeline type: async ===
+Mode: seq
+  Average Time:          23.2424 s
+  Std Error Of The Mean: 1.2507 s
+
+Mode: pixels
+  Average Time:          23.5817 s
+  Std Error Of The Mean: 0.5109 s
+
+Mode: rows
+  Average Time:          8.4324 s
+  Std Error Of The Mean: 0.4726 s
+
+Mode: cols
+  Average Time:          8.6094 s
+  Std Error Of The Mean: 0.2477 s
+
+Mode: tiles
+  Average Time:          8.3390 s
+  Std Error Of The Mean: 0.0738 s
+
+=== Pipeline type: seq ===
+Mode: seq
+  Average Time:          46.3251 s
+  Std Error Of The Mean: 1.9338 s
+
+Mode: pixels
+  Average Time:          16.1622 s
+  Std Error Of The Mean: 1.5203 s
+
+Mode: rows
+  Average Time:          10.6896 s
+  Std Error Of The Mean: 0.0435 s
+
+Mode: cols
+  Average Time:          10.7209 s
+  Std Error Of The Mean: 0.0238 s
+
+Mode: tiles
+  Average Time:          10.8410 s
+  Std Error Of The Mean: 0.0368 s

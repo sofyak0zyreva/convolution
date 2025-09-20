@@ -1,0 +1,33 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.1.0'
+    id 'application'
+    id 'org.jlleitschuh.gradle.ktlint' version '11.6.0'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    implementation("org.bytedeco:opencv-platform:4.6.0-1.5.8") // Includes all platforms
+    implementation("org.bytedeco:openblas-platform:0.3.21-1.5.8") // For math optimizations
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+}
+application {
+    mainClassName = 'convolution.MainKt'
+}
+run {
+    standardInput = System.in
+}
+test {
+    useJUnitPlatform()
+}
+kotlin {
+    jvmToolchain(20)
+}
+

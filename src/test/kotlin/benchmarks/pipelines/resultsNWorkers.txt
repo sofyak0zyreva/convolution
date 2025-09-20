@@ -1,0 +1,83 @@
+=== Pipeline type: async, concurrency = 8 ===
+Mode: seq
+  Average Time:          23.2424 s
+  Std Error Of The Mean: 1.2507 s
+
+Mode: pixels
+  Average Time:          23.5817 s
+  Std Error Of The Mean: 0.5109 s
+
+Mode: rows
+  Average Time:          8.4324 s
+  Std Error Of The Mean: 0.4726 s
+
+Mode: cols
+  Average Time:          8.6094 s
+  Std Error Of The Mean: 0.2477 s
+
+Mode: tiles
+  Average Time:          8.3390 s
+  Std Error Of The Mean: 0.0738 s
+
+=== Pipeline type: async, concurrency = 4 ===
+Mode: seq
+  Average Time:          17.6897 s
+  Std Error Of The Mean: 0.6032 s
+
+Mode: pixels
+  Average Time:          27.2266 s
+  Std Error Of The Mean: 2.8882 s
+
+Mode: rows
+  Average Time:          11.9267 s
+  Std Error Of The Mean: 0.6592 s
+
+Mode: cols
+  Average Time:          8.6565 s
+  Std Error Of The Mean: 0.1735 s
+
+Mode: tiles
+  Average Time:          8.6625 s
+  Std Error Of The Mean: 0.1560 s
+
+=== Pipeline type: async, concurrency = 2 ===
+Mode: seq
+  Average Time:          31.6422 s
+  Std Error Of The Mean: 0.1509 s
+
+Mode: pixels
+  Average Time:          18.1427 s
+  Std Error Of The Mean: 0.7065 s
+
+Mode: rows
+  Average Time:          10.1314 s
+  Std Error Of The Mean: 0.0694 s
+
+Mode: cols
+  Average Time:          10.5366 s
+  Std Error Of The Mean: 0.1753 s
+
+Mode: tiles
+  Average Time:          10.7016 s
+  Std Error Of The Mean: 0.0653 s
+
+=== Pipeline type: async, concurrency = 1 ===
+Mode: seq
+  Average Time:          34.6955 s
+  Std Error Of The Mean: 0.4686 s
+
+Mode: pixels
+  Average Time:          16.2023 s
+  Std Error Of The Mean: 1.7229 s
+
+Mode: rows
+  Average Time:          10.7555 s
+  Std Error Of The Mean: 0.0260 s
+
+Mode: cols
+  Average Time:          11.5219 s
+  Std Error Of The Mean: 0.0182 s
+
+Mode: tiles
+  Average Time:          11.4317 s
+  Std Error Of The Mean: 0.0404 s
